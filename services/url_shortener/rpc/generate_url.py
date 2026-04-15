@@ -22,4 +22,4 @@ async def _generate_unique_short_url(original_url: str) -> str:
 
 def _hash(original_url: str, attempt: int = 0) -> str:
     salted = f"{original_url}{attempt}"
-    return hashlib.md5(salted.encode()).hexdigest()[:7]
+    return hashlib.md5(salted.encode()).hexdigest()[:8]

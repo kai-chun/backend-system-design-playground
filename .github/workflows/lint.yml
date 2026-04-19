@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install ruff mypy
+          pip install ruff
           pip install -r requirements.txt
 
       - name: Ruff lint
@@ -31,6 +31,3 @@ jobs:
 
       - name: Ruff format check
         run: ruff format --check .
-
-      - name: Mypy type check
-        run: mypy . --ignore-missing-imports

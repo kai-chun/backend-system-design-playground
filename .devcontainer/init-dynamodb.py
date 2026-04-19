@@ -2,6 +2,7 @@
 Creates the DynamoDB `urls` table (with GSI) against DynamoDB Local.
 Run once after the container starts: python .devcontainer/init-dynamodb.py
 """
+
 import os
 import time
 

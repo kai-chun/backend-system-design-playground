@@ -1,0 +1,54 @@
+#!/bin/bash
+set -euo pipefail
+
+if ! docker info &>/dev/null; then
+  echo "[post-push] Docker is not running, skipping AI review. Start Docker Desktop and re-push if needed."
+  exit 0
+fi
+
+BRANCH=$(git branch --show-current)
+PR_NUMBER=$(gh pr list --head "$BRANCH" --json number -q '.[0].number' 2>/dev/null)
+
+if [ -z "$PR_NUMBER" ]; then
+  echo "[post-push] No open PR found for branch '$BRANCH', skipping review."
+  exit 0
+fi
+
+REPO=$(gh repo view --json nameWithOwner -q '.nameWithOwner')
+
+echo "[post-push] Triggering AI code review for $REPO PR #$PR_NUMBER (branch: $BRANCH)..."
+
+claude -p "
+You are a senior engineer doing a thorough code review.
+
+Review PR #$PR_NUMBER in the GitHub repository '$REPO'.
+
+Steps:
+1. Use the GitHub MCP tool to fetch the PR diff and metadata (title, description, changed files).
+2. Review the changes for:
+   - Correctness and logic errors
+   - Security vulnerabilities (injection, auth bypass, secrets in code, etc.)
+   - Type safety and null/undefined handling
+   - Performance concerns
+   - Code style and best practices
+   - Missing tests for critical paths
+3. Post a single structured review comment to the PR using the GitHub MCP tool.
+   Format the comment as:
+   ## AI Code Review
+
+   ### Summary
+   <brief summary of what the PR does>
+
+   ### Issues Found
+   <list any problems, grouped by severity: 🔴 Critical / 🟡 Warning / 🔵 Suggestion>
+
+   ### Looks Good
+   <list things done well>
+
+   If there are no issues, say so clearly.
+" \
+  --allowedTools "mcp__github__*" \
+  --dangerouslySkipPermissions \
+  2>&1 | tee /tmp/claude-pr-review-$PR_NUMBER.log
+
+echo "[post-push] Review complete. Log saved to /tmp/claude-pr-review-$PR_NUMBER.log"

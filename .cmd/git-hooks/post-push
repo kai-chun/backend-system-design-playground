@@ -47,8 +47,9 @@ Steps:
 
    If there are no issues, say so clearly.
 " \
+  --verbose \
   --allowedTools "mcp__github__*" \
-  --dangerouslySkipPermissions \
+  --dangerously-skip-permissions \
   2>&1 | tee /tmp/claude-pr-review-$PR_NUMBER.log
 
 echo "[post-push] Review complete. Log saved to /tmp/claude-pr-review-$PR_NUMBER.log"

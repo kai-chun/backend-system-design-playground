@@ -1,0 +1,35 @@
+{
+  "name": "backend-system-design-playground",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.pylance",
+        "ms-python.black-formatter"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "editor.formatOnSave": true,
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.black-formatter"
+        }
+      }
+    }
+  },
+
+  "forwardPorts": [8000, 8001],
+  "portsAttributes": {
+    "8000": { "label": "FastAPI" },
+    "8001": { "label": "DynamoDB Local" }
+  },
+
+  "postCreateCommand": "cp -n /workspace/.env.example /workspace/.env && pip install -r /workspace/requirements.txt && python /workspace/.devcontainer/init-dynamodb.py",
+
+  "remoteEnv": {
+    "PYTHONPATH": "/workspace:/workspace/services/url_shortener"
+  }
+}
